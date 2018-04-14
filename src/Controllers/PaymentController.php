@@ -23,6 +23,7 @@ use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Basket\Contracts\BasketRepositoryContract;
 use Novalnet\Services\PaymentService;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Plugin\ConfigRepository;
 
 /**
  * Class PaymentController
@@ -67,6 +68,10 @@ class PaymentController extends Controller
      * @var Twig
      */
     private $twig;
+    /**
+     * @var ConfigRepository
+     */
+    private $config;
 
     /**
      * PaymentController constructor.
@@ -78,6 +83,7 @@ class PaymentController extends Controller
      */
     public function __construct(  Request $request,
                                   Response $response,
+                                  ConfigRepository $config,
                                   PaymentHelper $paymentHelper,
                                   FrontendSessionStorageFactoryContract $sessionStorage,
                                   BasketRepositoryContract $basketRepository,
@@ -93,6 +99,7 @@ class PaymentController extends Controller
         $this->basketRepository          = $basketRepository;
         $this->paymentService  = $paymentService;
         $this->twig            = $twig;
+        $this->config         = $config;
     }
 
     /**
@@ -129,7 +136,7 @@ class PaymentController extends Controller
             $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
             $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $requestData));
 			
-			if(in_array($requestData['payment_type'],['ONLINE_TRANSFER','PRZELEWY24','GIROPAY','EPS','IDEAL','PAYPAL']))
+			if((in_array($requestData['payment_type'],['ONLINE_TRANSFER','PRZELEWY24','GIROPAY','EPS','IDEAL','PAYPAL'])) || ($requestData['payment_type'] == 'CREDITCARD'&& $this->config->get('Novalnet.cc_3d') == 'true') )
 				{
 					$this->paymentService->validateResponse();
 				}
