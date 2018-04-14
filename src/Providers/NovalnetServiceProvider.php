@@ -284,6 +284,7 @@ $content='';
 				$sessionStorage->getPlugin()->setValue('nnOrderNo',$event->getOrderId());
 				$sessionStorage->getPlugin()->setValue('mop',$event->getMop());
 				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
+				$sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
 				   
 				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_CC','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']))
 					{
@@ -291,131 +292,21 @@ $content='';
 					}
 				    
 				    
-				    if($paymentKey =='NOVALNET_SOFORT')
+				    if(in_array($paymentKey,['NOVALNET_SOFORT','NOVALNET_PRZELEWY','NOVALNET_GIROPAY','NOVALNET_EPS','NOVALNET_IDEAL','NOVALNET_PAYPAL']))
 				    {
 						$paymentProcessUrl = $paymentService->getRedirectPaymentUrl();
-						$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
-						
-						$sessionStorage->getPlugin()->setValue('nnOrderNo', $event->getOrderId());
-						$sessionStorage->getPlugin()->setValue('mop',$event->getMop());
-						$sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
+						//$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
+						//$sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
 						$event->setType('redirectUrl');
 						$event->setValue($paymentProcessUrl);
 					
 						
 					}
 					
-				
-				
-					
-				
-				
-				
-			
-				
-				
-				
-		//~ $responseData = $paymentHelper->convertStringToArray($response['response'], '&');
-        //~ $responseData['payment_id'] = (!empty($responseData['payment_id'])) ? $responseData['payment_id'] : $responseData['key'];
-        //~ $isPaymentSuccess = isset($responseData['status']) && in_array($responseData['status'], ['90','100']);
-
-        //~ $notifications = json_decode($sessionStorage->getPlugin()->getValue('notifications'));
-        //~ array_push($notifications,[
-                //~ 'message' => $paymentHelper->getNovalnetStatusText($responseData),
-                //~ 'type'    => $isPaymentSuccess ? 'success' : 'error',
-                //~ 'code'    => 0
-            //~ ]);
-        //~ $sessionStorage->getPlugin()->setValue('notifications', json_encode($notifications));
-        
-
-        //~ if($isPaymentSuccess)
-        //~ {
-            //~ if(!preg_match('/^[0-9]/', $responseData['test_mode']))
-            //~ {
-                //~ $responseData['test_mode'] = $paymentHelper->decodeData($responseData['test_mode'], $responseData['uniqid']);
-                //~ $responseData['amount']    = $paymentHelper->decodeData($responseData['amount'], $responseData['uniqid']) / 100;
-            //~ }
-
-            //~ if(isset($serverRequestData['data']['pan_hash']))
-            //~ {
-                //~ unset($serverRequestData['data']['pan_hash']);
-            //~ }
-            //~ elseif(isset($serverRequestData['data']['sepa_hash']))
-            //~ {
-                //~ unset($serverRequestData['data']['pan_hash']);
-            //~ }
-           //~ // $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($serverRequestData['data'], $responseData));
-
-            //~ // Redirect to the success page.
-            //~ //return $this->response->redirectTo('place-order');
-        //~ } else {
-            //~ // Redirects to the cancellation page.
-            //~ return $response->redirectTo('checkout');
-        //~ }
+	
     
 				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-                //~ if($paymentHelper->isNovalnetPaymentMethod($event->getMop()))
-                //~ {
-                    //~ $requestData = $sessionStorage->getPlugin()->getValue('nnPaymentData');
-                    //~ $sessionStorage->getPlugin()->setValue('nnPaymentData',null);
-                    //~ if(isset($requestData['status']) && in_array($requestData['status'], ['90', '100']))
-                    //~ {
-                        //~ $requestData['order_no'] = $event->getOrderId();
-                        //~ $requestData['mop']      = $event->getMop();
-                        //~ $paymentService->sendPostbackCall($requestData);
-
-                        //~ $paymentResult = $paymentService->executePayment($requestData);
-                        //~ $isPrepayment = (bool)($requestData['payment_id'] == '27' && $requestData['invoice_type'] == 'PREPAYMENT');
-
-                        //~ $transactionData = [
-                            //~ 'amount'           => $requestData['amount'] * 100,
-                            //~ 'callback_amount'  => $requestData['amount'] * 100,
-                            //~ 'tid'              => $requestData['tid'],
-                            //~ 'ref_tid'          => $requestData['tid'],
-                            //~ 'payment_name'     => $paymentHelper->getPaymentNameByResponse($requestData['payment_id'], $isPrepayment),
-                            //~ 'payment_type'     => $requestData['payment_type'],
-                            //~ 'order_no'         => $requestData['order_no'],
-                        //~ ];
-
-                        //~ if($requestData['payment_id'] == '27' || $requestData['payment_id'] == '59' || (in_array($requestData['tid_status'], ['85','86','90'])))
-                            //~ $transactionData['callback_amount'] = 0;
-
-                        //~ $transactionLogData->saveTransaction($transactionData);
-                    //~ } else {
-                        //~ $paymentResult['type'] = 'error';
-                        //~ $paymentResult['value'] = $paymentHelper->getTranslatedText('payment_not_success');
-                    //~ }
-                    //~ $event->setType($paymentResult['type']);
-                    //~ $event->setValue($paymentResult['value']);
-                //~ }
+		
             }
         );
     }
