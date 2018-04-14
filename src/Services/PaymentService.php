@@ -24,6 +24,7 @@ use Novalnet\Helper\PaymentHelper;
 use Plenty\Plugin\Log\Loggable;
 use Plenty\Modules\Frontend\Services\AccountService;
 use Novalnet\Constants\NovalnetConstants;
+use Novalnet\Services\TransactionService;
 
 /**
  * Class PaymentService
@@ -43,7 +44,7 @@ class PaymentService
     /**
      * @var FrontendSessionStorageFactoryContract
      */
-    private $session;
+    private $sessionStorage;
 
     /**
      * @var AddressRepositoryContract
@@ -64,6 +65,9 @@ class PaymentService
      * @var PaymentHelper
      */
     private $paymentHelper;
+    
+    
+   
 
     /**
      * Constructor.
@@ -76,18 +80,20 @@ class PaymentService
      * @param PaymentHelper $paymentHelper
      */
     public function __construct(ConfigRepository $config,
-                                FrontendSessionStorageFactoryContract $session,
+                                FrontendSessionStorageFactoryContract $sessionStorage,
                                 AddressRepositoryContract $addressRepository,
                                 CountryRepositoryContract $countryRepository,
                                 WebstoreHelper $webstoreHelper,
-                                PaymentHelper $paymentHelper)
+                                PaymentHelper $paymentHelper,
+                                TransactionService $transactionLogData)
     {
         $this->config            = $config;
-        $this->session           = $session;
+        $this->sessionStorage           = $sessionStorage;
         $this->addressRepository = $addressRepository;
         $this->countryRepository = $countryRepository;
         $this->webstoreHelper    = $webstoreHelper;
         $this->paymentHelper     = $paymentHelper;
+        $this->transactionLogData  = $transactionLogData;
     }
 
     /**
@@ -162,10 +168,10 @@ class PaymentService
                         
                         if(in_array($requestData['payment_type'],$this->getTypeByPaymentKey('NOVALNET_INVOICE','NOVALNET_CC','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT')))
                         {
-                        $this->paymentService->sendPostbackCall($requestData);
+                        $this->sendPostbackCall($requestData);
 						}
 
-                        $paymentResult = $this->paymentService->executePayment($requestData);
+                        $paymentResult = $this->executePayment($requestData);
                         $isPrepayment = (bool)($requestData['payment_id'] == '27' && $requestData['invoice_type'] == 'PREPAYMENT');
 
                         $transactionData = [
@@ -173,7 +179,7 @@ class PaymentService
                             'callback_amount'  => $requestData['amount'] * 100,
                             'tid'              => $requestData['tid'],
                             'ref_tid'          => $requestData['tid'],
-                            'payment_name'     => $paymentHelper->getPaymentNameByResponse($requestData['payment_id'], $isPrepayment),
+                            'payment_name'     => $this->paymentHelper->getPaymentNameByResponse($requestData['payment_id'], $isPrepayment),
                             'payment_type'     => $requestData['payment_type'],
                             'order_no'         => $requestData['order_no'],
                         ];
