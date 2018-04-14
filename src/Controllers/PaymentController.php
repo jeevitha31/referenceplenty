@@ -132,7 +132,7 @@ class PaymentController extends Controller
 				
 				  if($requestData['payment_type'] =='ONLINE_TRANSFER')
 				    {
-						$this->paymentService->validateResponse();
+						$this->paymentService->validateResponse($requestData);
 					}
 
 
@@ -162,10 +162,10 @@ class PaymentController extends Controller
             if(!empty($serverRequestData['data']['cc_3d']))
             {
                 $this->sessionStorage->getPlugin()->setValue('nnPaymentData', $serverRequestData['data']);
-                 return $this->twig->render('Novalnet::NovalnetPaymentRedirectForm', [
-                                                                'formData'     => $serverRequestData['data'],
-                                                                'nnPaymentUrl' => $serverRequestData['url']
-                                   ]);
+                $this->sessionStorage->getPlugin()->setValue('nnPaymentUrl',$serverRequestData['url']);
+                
+                return $this->response->redirectTo('place-order');
+                 
             }
         }
         else if($requestData['paymentKey'] == 'NOVALNET_SEPA')
