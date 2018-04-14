@@ -132,7 +132,7 @@ class PaymentController extends Controller
 				
 				  if($requestData['payment_type'] =='ONLINE_TRANSFER')
 				    {
-						$this->paymentService->validateResponse($requestData);
+						$this->paymentService->validateResponse();
 					}
 
 
