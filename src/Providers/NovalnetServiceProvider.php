@@ -286,13 +286,13 @@ $content='';
 				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
 				$sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
 				   
-				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_CC','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']))
+				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']) || ($paymentKey == 'NOVALNET_CC' && $this->config->get('Novalnet.cc_3d') != 'true'))
 					{
 						$paymentService->validateResponse();
 					}
 				    
 				    
-				    if(in_array($paymentKey,['NOVALNET_SOFORT','NOVALNET_PRZELEWY','NOVALNET_GIROPAY','NOVALNET_EPS','NOVALNET_IDEAL','NOVALNET_PAYPAL']))
+				    if(in_array($paymentKey,['NOVALNET_SOFORT','NOVALNET_PRZELEWY','NOVALNET_GIROPAY','NOVALNET_EPS','NOVALNET_IDEAL','NOVALNET_PAYPAL']) || ($paymentKey == 'NOVALNET_CC'&&$this->config->get('Novalnet.cc_3d') == 'true'))
 				    {
 						$paymentProcessUrl = $paymentService->getRedirectPaymentUrl();
 						//$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
