@@ -280,29 +280,15 @@ $content='';
         $eventDispatcher->listen(ExecutePayment::class,
             function (ExecutePayment $event) use ($paymentHelper, $paymentService, $sessionStorage, $transactionLogData,$twig,$basketRepository)
             {
-				//~ $paymentparams = $sessionStorage->getPlugin()->getValue('params');
-				
-				//~ $paymenturl = $sessionStorage->getPlugin()->getValue('url');
-				
-				 //~ $response = $paymentHelper->executeCurl($paymentparams, $paymenturl);
-				
-				
-				
-				   $paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
+			
+				$sessionStorage->getPlugin()->setValue('nnOrderNo',$event->getOrderId());
+				$sessionStorage->getPlugin()->setValue('mop',$event->getMop());
+				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
 				   
 				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_CC','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']))
 					{
-						
-						$sessionStorage->getPlugin()->setValue('nnOrderNo',$event->getOrderId());
-						$sessionStorage->getPlugin()->setValue('mop',$event->getMop());
-					  	$paymentService->validateResponse();
-                       
-                      
+						$paymentService->validateResponse();
 					}
-				    
-				    
-				    
-				    
 				    
 				    
 				    if($paymentKey =='NOVALNET_SOFORT')
