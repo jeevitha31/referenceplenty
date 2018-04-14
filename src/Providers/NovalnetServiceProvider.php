@@ -30,6 +30,7 @@ use Novalnet\Helper\PaymentHelper;
 use Novalnet\Services\PaymentService;
 use Novalnet\Services\TransactionService;
 use Plenty\Plugin\Templates\Twig;
+use Plenty\Plugin\ConfigRepository;
 
 use Novalnet\Methods\NovalnetInvoicePaymentMethod;
 use Novalnet\Methods\NovalnetPrepaymentPaymentMethod;
@@ -81,7 +82,8 @@ class NovalnetServiceProvider extends ServiceProvider
                           PaymentMethodRepositoryContract $paymentMethodService,
                           FrontendSessionStorageFactoryContract $sessionStorage,
                           TransactionService $transactionLogData,
-                          Twig $twig)
+                          Twig $twig,
+                          ConfigRepository $config)
     {
 
         // Register the Novalnet payment methods in the payment method container
@@ -278,21 +280,23 @@ $content='';
 
         // Listen for the event that executes the payment
         $eventDispatcher->listen(ExecutePayment::class,
-            function (ExecutePayment $event) use ($paymentHelper, $paymentService, $sessionStorage, $transactionLogData,$twig,$basketRepository)
+            function (ExecutePayment $event) use ($paymentHelper, $paymentService, $sessionStorage, $transactionLogData,$config,$basketRepository)
             {
-			
+				
+			if($paymentHelper->isNovalnetPaymentMethod($event->getMop()))
+               {
 				$sessionStorage->getPlugin()->setValue('nnOrderNo',$event->getOrderId());
 				$sessionStorage->getPlugin()->setValue('mop',$event->getMop());
 				$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
 				$sessionStorage->getPlugin()->setValue('paymentkey', $paymentKey);
 				   
-				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']) || ($paymentKey == 'NOVALNET_CC' && $this->config->get('Novalnet.cc_3d') != 'true'))
+				  if(in_array($paymentKey,['NOVALNET_INVOICE','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT']) || ($paymentKey == 'NOVALNET_CC' && $config->get('Novalnet.cc_3d') != 'true'))
 					{
 						$paymentService->validateResponse();
 					}
 				    
 				    
-				    if(in_array($paymentKey,['NOVALNET_SOFORT','NOVALNET_PRZELEWY','NOVALNET_GIROPAY','NOVALNET_EPS','NOVALNET_IDEAL','NOVALNET_PAYPAL']) || ($paymentKey == 'NOVALNET_CC'&&$this->config->get('Novalnet.cc_3d') == 'true'))
+				    if(in_array($paymentKey,['NOVALNET_SOFORT','NOVALNET_PRZELEWY','NOVALNET_GIROPAY','NOVALNET_EPS','NOVALNET_IDEAL','NOVALNET_PAYPAL']) || ($paymentKey == 'NOVALNET_CC'&& $config->get('Novalnet.cc_3d') == 'true'))
 				    {
 						$paymentProcessUrl = $paymentService->getRedirectPaymentUrl();
 						//$paymentKey = $paymentHelper->getPaymentKeyByMop($event->getMop());
@@ -304,7 +308,7 @@ $content='';
 					}
 					
 	
-    
+				}
 				
 		
             }
