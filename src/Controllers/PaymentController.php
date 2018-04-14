@@ -128,12 +128,11 @@ class PaymentController extends Controller
 
             $paymentRequestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
             $this->sessionStorage->getPlugin()->setValue('nnPaymentData', array_merge($paymentRequestData, $requestData));
-				
-				
-				  if($requestData['payment_type'] =='ONLINE_TRANSFER')
-				    {
-						$this->paymentService->validateResponse($requestData);
-					}
+			
+			if(in_array($requestData['payment_type'],['ONLINE_TRANSFER','PRZELEWY24','GIROPAY','EPS','IDEAL','PAYPAL']))
+				{
+					$this->paymentService->validateResponse();
+				}
 
 
             // Redirect to the success page.
