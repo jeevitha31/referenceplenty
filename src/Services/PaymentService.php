@@ -166,7 +166,7 @@ class PaymentService
                         $requestData['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
                         $requestData['mop']      = $this->sessionStorage->getPlugin()->getValue('mop');
                         
-                        if(in_array($requestData['payment_type'],$this->getTypeByPaymentKey('NOVALNET_INVOICE','NOVALNET_CC','NOVALNET_SEPA','NOVALNET_PREPAYMENT','NOVALNET_CASHPAYMENT')))
+                        if(in_array($requestData['payment_type'],['INVOICE_START','CREDITCARD','DIRECT_DEBIT_SEPA','CASHPAYMENT']))
                         {
                         $this->sendPostbackCall($requestData);
 						}
