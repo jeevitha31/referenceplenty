@@ -67,7 +67,7 @@ class PaymentService
     private $paymentHelper;
     
     
-   
+    private $transactionLogData;
 
     /**
      * Constructor.
@@ -187,7 +187,7 @@ class PaymentService
                         if($requestData['payment_id'] == '27' || $requestData['payment_id'] == '59' || (in_array($requestData['tid_status'], ['85','86','90'])))
                             $transactionData['callback_amount'] = 0;
 
-                        $transactionLogData->saveTransaction($transactionData);
+                        $this->transactionLogData->saveTransaction($transactionData);
                     } else {
                         $paymentResult['type'] = 'error';
                         $paymentResult['value'] = $this->paymentHelper->getTranslatedText('payment_not_success');
@@ -361,7 +361,7 @@ class PaymentService
                 'country_code'       => $this->countryRepository->findIsoCode($address->countryId, 'iso_code_2'),
                 'zip'                => $address->postalCode,
                 'customer_no'        => ($customerId) ? $customerId : 'guest',
-                'lang'               => strtoupper($this->session->getLocaleSettings()->language),
+                'lang'               => strtoupper($this->sessionStorage->getLocaleSettings()->language),
                 'amount'             => (sprintf('%0.2f', $basket->basketAmount) * 100),
                 'currency'           => $basket->currency,
                 'remote_ip'          => $this->paymentHelper->getRemoteAddress(),
