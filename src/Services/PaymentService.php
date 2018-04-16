@@ -171,7 +171,7 @@ class PaymentService
                         $requestData['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
                         $requestData['mop']      = $this->sessionStorage->getPlugin()->getValue('mop');
                      
-                        if(in_array($requestData['payment_type'],['INVOICE_START','CREDITCARD','DIRECT_DEBIT_SEPA','CASHPAYMENT']) || ($requestData['payment_type'] == 'CREDITCARD' && $this->config->get('Novalnet.cc_3d') == 'false'))
+                        if(in_array($requestData['payment_type'],['INVOICE_START','DIRECT_DEBIT_SEPA','CASHPAYMENT']) || ($requestData['payment_type'] == 'CREDITCARD' && $this->config->get('Novalnet.cc_3d') == 'false'))
                         {
                         $this->sendPostbackCall($requestData);
 						}
