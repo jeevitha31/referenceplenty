@@ -83,6 +83,13 @@
     },
     {
         "tab"    : "Credit Card",
+        "key"    : "cc_3d_fraudcheck",
+        "label"  : "Make 3D Secure payments under specified conditions",
+        "type"   : "checkbox",
+        "default": false
+    },
+    {
+        "tab"    : "Credit Card",
         "key"    : "cc_on_hold",
         "label"  : "Set a limit for on-hold transaction (in minimum unit of currency. E.g. enter 100 which is equal to 1.00)",
         "type"   : "text"
