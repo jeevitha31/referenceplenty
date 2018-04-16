@@ -66,7 +66,9 @@ class PaymentService
      */
     private $paymentHelper;
     
-    
+    /**
+     * @var TransactionLogData
+     */
     private $transactionLogData;
 
     /**
@@ -87,13 +89,13 @@ class PaymentService
                                 PaymentHelper $paymentHelper,
                                 TransactionService $transactionLogData)
     {
-        $this->config            = $config;
-        $this->sessionStorage           = $sessionStorage;
-        $this->addressRepository = $addressRepository;
-        $this->countryRepository = $countryRepository;
-        $this->webstoreHelper    = $webstoreHelper;
-        $this->paymentHelper     = $paymentHelper;
-        $this->transactionLogData  = $transactionLogData;
+        $this->config					= $config;
+        $this->sessionStorage			= $sessionStorage;
+        $this->addressRepository		= $addressRepository;
+        $this->countryRepository		= $countryRepository;
+        $this->webstoreHelper			= $webstoreHelper;
+        $this->paymentHelper			= $paymentHelper;
+        $this->transactionLogData		= $transactionLogData;
     }
 
     /**
@@ -154,9 +156,12 @@ class PaymentService
         }
     }
     
-
-    
-    
+	/**
+     * Validate  the response data in plentymarkets.
+     *
+     * @param array $requestData
+     *
+     */
     public function validateResponse()
 		{
 					$requestData = $this->sessionStorage->getPlugin()->getValue('nnPaymentData');
@@ -165,8 +170,8 @@ class PaymentService
                     {
                         $requestData['order_no'] = $this->sessionStorage->getPlugin()->getValue('nnOrderNo');
                         $requestData['mop']      = $this->sessionStorage->getPlugin()->getValue('mop');
-                        
-                        if(in_array($requestData['payment_type'],['INVOICE_START','CREDITCARD','DIRECT_DEBIT_SEPA','CASHPAYMENT']))
+                     
+                        if(in_array($requestData['payment_type'],['INVOICE_START','CREDITCARD','DIRECT_DEBIT_SEPA','CASHPAYMENT']) || ($requestData['payment_type'] == 'CREDITCARD' && $this->config->get('Novalnet.cc_3d') == 'false'))
                         {
                         $this->sendPostbackCall($requestData);
 						}
@@ -193,16 +198,9 @@ class PaymentService
                         $paymentResult['value'] = $this->paymentHelper->getTranslatedText('payment_not_success');
                     }
 		
-		
-		
-		
 		}
   
   
-
-
-
-
 
     /**
      * Build transaction comments for the order
@@ -508,7 +506,7 @@ class PaymentService
             'implementation' => 'ENC',
             'uniqid'         => $requestData['uniqid']
         ];
-  $this->getLogger(__METHOD__)->error('directpaymentpostbackcall', $postbackData);
+		$this->getLogger(__METHOD__)->error('directpaymentpostbackcall', $postbackData);
         if(in_array($requestData['payment_id'], ['27', '41']))
         {
             $productId = $requestData['product'];
